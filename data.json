@@ -1,0 +1,15 @@
+{
+  "config": {
+    "name": "CommerceWorld",
+    "tagline": "Your trusted source for digital commerce news.",
+    "copyright": "\u00a9 2026 CommerceWorld. All rights reserved.",
+    "nlTitle": "Stay in the loop",
+    "nlSub": "Get the latest commerce news delivered to your inbox."
+  },
+  "articles": [],
+  "footerLinks": {
+    "company": [],
+    "resources": [],
+    "social": []
+  }
+}
