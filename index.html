@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OwlEconomics</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#F5C518;--gold-d:#C9A000;
+  --bg:#0F1117;--bg2:#181B28;--bg3:#22253A;
+  --text:#FFFFFF;--text2:#B0B3C1;--text3:#5A5E72;
+  --border:#252840;--card:#181B28;
+  --red:#E53E3E;--green:#38A169;--blue:#4299E1;--purple:#805AD5;--orange:#DD6B20;
+}
+[data-theme=light]{
+  --bg:#F4F6FF;--bg2:#FFFFFF;--bg3:#ECEEF8;
+  --text:#0A0C18;--text2:#3A3D52;--text3:#8A8DA3;
+  --border:#DDE0EE;--card:#FFFFFF;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden}
+.view{display:none}.view.active{display:block}
+
+/* NAV */
+nav.topnav{
+  position:sticky;top:0;z-index:200;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 14px;height:58px;gap:10px;
+}
+.nav-logo{flex:1;font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;letter-spacing:.2px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--gold);font-style:italic;font-weight:700}
+.logo-icon{flex-shrink:0;display:inline-block;vertical-align:middle;filter:drop-shadow(0 1px 3px rgba(245,197,24,.25))}
+.nav-btn{background:none;border:none;cursor:pointer;color:var(--text);padding:7px;border-radius:6px;display:flex;align-items:center;transition:background .2s}
+.nav-btn:hover{background:var(--bg3)}
+.admin-btn{
+  background:linear-gradient(135deg,#1a1d2e,#252840);
+  border:1px solid var(--border);color:var(--text3);
+  padding:6px 12px;border-radius:6px;font-size:0.75rem;
+  font-weight:700;cursor:pointer;letter-spacing:.5px;
+  display:flex;align-items:center;gap:5px;transition:all .2s;
+}
+.admin-btn:hover{border-color:var(--gold);color:var(--gold)}
+.admin-btn.active-admin{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.07)}
+
+/* FLOATING CATS */
+.float-cats{
+  position:sticky;top:58px;z-index:190;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;overflow-x:auto;gap:0;padding:0 14px;scrollbar-width:none;
+}
+.float-cats::-webkit-scrollbar{display:none}
+.cat-tab{
+  padding:11px 14px;font-size:0.75rem;font-weight:700;
+  letter-spacing:.6px;text-transform:uppercase;
+  color:var(--text3);border:none;background:none;
+  cursor:pointer;border-bottom:2px solid transparent;
+  white-space:nowrap;transition:all .2s;
+}
+.cat-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.cat-tab:hover{color:var(--text)}
+
+/* SEARCH */
+.search-wrap{max-width:760px;margin:14px auto 0;padding:0 14px}
+.search-bar{display:flex}
+.search-bar input{
+  flex:1;padding:10px 14px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-right:none;border-radius:6px 0 0 6px;
+  color:var(--text);font-size:0.88rem;outline:none;
+}
+.search-bar input::placeholder{color:var(--text3)}
+.search-bar button{padding:10px 18px;background:var(--gold);border:none;border-radius:0 6px 6px 0;font-weight:700;font-size:0.85rem;cursor:pointer;color:#000}
+
+/* FEED */
+.feed-wrap{max-width:760px;margin:0 auto;padding:18px 14px}
+.section-label{display:flex;align-items:center;gap:10px;font-size:.85rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px}
+.section-label::before{content:'';width:3px;height:18px;background:var(--gold);border-radius:2px}
+.thumb-row{display:flex;gap:10px;overflow-x:auto;margin-bottom:24px;scrollbar-width:none}
+.thumb-row::-webkit-scrollbar{display:none}
+.thumb-card{flex:0 0 138px;cursor:pointer;color:var(--text)}
+.thumb-card img{width:138px;height:86px;object-fit:cover;border-radius:6px;display:block;transition:opacity .2s}
+.thumb-card:hover img{opacity:.82}
+.thumb-title{font-size:.74rem;font-weight:600;margin-top:5px;line-height:1.3}
+
+/* ARTICLE CARD */
+.article-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;margin-bottom:18px;
+  cursor:pointer;transition:border-color .2s,transform .15s;
+  display:block;text-decoration:none;color:var(--text);position:relative;
+}
+.article-card:hover{border-color:var(--gold);transform:translateY(-1px)}
+.article-card img{width:100%;height:195px;object-fit:cover;display:block}
+.a-body{padding:13px}
+.a-meta{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.tag{padding:3px 7px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.tag.trade{background:var(--gold);color:#000}.tag.tech{background:var(--blue);color:#fff}
+.tag.web3{background:var(--purple);color:#fff}.tag.currency{background:var(--green);color:#fff}
+.tag.startups{background:var(--red);color:#fff}.tag.trend{background:var(--orange);color:#fff}
+.tag.latest{background:var(--gold);color:#000}
+.a-date{font-size:.72rem;color:var(--text3)}
+.a-title{font-size:1rem;font-weight:700;line-height:1.4;margin-bottom:6px}
+.a-excerpt{font-size:.83rem;color:var(--text2);line-height:1.6}
+.read-more{display:inline-flex;align-items:center;gap:4px;margin-top:9px;font-size:.78rem;font-weight:700;color:var(--gold)}
+.save-btn{
+  position:absolute;top:10px;right:10px;
+  background:rgba(0,0,0,.55);border:none;border-radius:50%;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#fff;transition:background .2s;backdrop-filter:blur(4px);
+}
+.save-btn:hover{background:rgba(245,197,24,.8);color:#000}
+.save-btn.saved{background:var(--gold);color:#000}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin:24px 0}
+.page-btn{padding:8px 16px;border:1px solid var(--border);background:none;color:var(--text);border-radius:4px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.page-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.page-btn:disabled{opacity:.3;cursor:default}
+.page-info{font-size:.88rem;color:var(--text3)}
+
+/* ARTICLE PAGE */
+#articlePageView{background:var(--bg)}
+.art-page-wrap{max-width:760px;margin:0 auto;padding:20px 14px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--text3);font-size:.82rem;font-weight:600;cursor:pointer;margin-bottom:18px;border:none;background:none;padding:0;transition:color .2s}
+.back-btn:hover{color:var(--gold)}
+.art-hero{width:100%;max-height:320px;object-fit:cover;border-radius:10px;margin-bottom:18px;display:block}
+.art-page-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.art-page-title{font-size:1.5rem;font-weight:900;line-height:1.3;margin-bottom:16px}
+.art-page-content{font-size:.94rem;color:var(--text2);line-height:1.8}
+.art-page-content h1,.art-page-content h2,.art-page-content h3{color:var(--text);margin:18px 0 8px}
+.art-page-content p{margin-bottom:12px}
+.art-page-content img{max-width:100%;border-radius:8px;margin:10px 0}
+.art-page-content a{color:var(--gold)}
+.art-page-content blockquote{border-left:3px solid var(--gold);padding-left:12px;color:var(--text3);font-style:italic;margin:14px 0}
+.art-page-divider{border:none;border-top:1px solid var(--border);margin:28px 0}
+.similar-section-label{font-size:.8rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.similar-grid{display:flex;flex-direction:column;gap:12px}
+.similar-card{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-decoration:none;color:var(--text);transition:border-color .2s}
+.similar-card:hover{border-color:var(--gold)}
+.similar-card img{width:80px;height:56px;object-fit:cover;border-radius:5px;flex-shrink:0}
+.similar-card-body .a-title{font-size:.82rem;line-height:1.3;margin-bottom:3px}
+.similar-card-body .a-date{font-size:.7rem}
+.art-save-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.art-save-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:7px;border:1px solid var(--border);
+  background:none;color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.art-save-btn:hover{border-color:var(--gold);color:var(--gold)}
+.art-save-btn.saved{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* NEWSLETTER */
+.newsletter{background:var(--gold);padding:34px 20px;text-align:center;margin-top:10px}
+.newsletter h2{font-size:1.35rem;font-weight:900;color:#000;letter-spacing:.8px;margin-bottom:7px}
+.newsletter p{font-size:.88rem;color:#333;margin-bottom:14px}
+.newsletter input{width:100%;padding:11px 13px;border-radius:6px;border:none;font-size:.88rem;margin-bottom:9px;outline:none;color:#222}
+.newsletter button{width:100%;padding:12px;background:#000;color:#fff;border:none;border-radius:6px;font-weight:700;font-size:.88rem;letter-spacing:.8px;cursor:pointer;text-transform:uppercase}
+.newsletter button:hover{background:#222}
+
+/* FOOTER */
+footer{background:#080A12;padding:34px 20px 18px}
+.footer-inner{max-width:760px;margin:0 auto}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;letter-spacing:.2px;color:#fff;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.footer-logo span{color:var(--gold);font-style:italic;font-weight:700}
+.footer-desc{font-size:.8rem;color:#666;line-height:1.6;margin-bottom:26px}
+.footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:26px}
+.footer-col h4{font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:11px}
+.footer-col a{display:block;color:#999;text-decoration:none;font-size:.85rem;margin-bottom:8px;transition:color .2s}
+.footer-col a:hover{color:#fff}
+.social-link{display:flex;align-items:center;gap:7px}
+.footer-bottom{border-top:1px solid #1a1c2a;padding-top:14px;font-size:.72rem;color:#444;text-align:center}
+
+/* OVERLAYS / MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 14px}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border-radius:12px;width:100%;max-width:700px;overflow:hidden;margin:auto}
+.modal-hdr{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);gap:10px}
+.modal-hdr h2{flex:1;font-size:.95rem;font-weight:700}
+.btn-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:1.3rem;padding:4px 8px;line-height:1}
+.btn-close:hover{color:var(--text)}
+
+/* ADMIN GATE */
+.admin-gate{padding:32px 20px;text-align:center;max-width:340px;margin:0 auto}
+.admin-gate h3{font-size:1rem;font-weight:800;margin-bottom:6px}
+.admin-gate p{font-size:.8rem;color:var(--text3);margin-bottom:18px}
+.gate-input{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:.9rem;outline:none;margin-bottom:10px;text-align:center;letter-spacing:2px}
+.btn-gold{width:100%;padding:11px;background:var(--gold);color:#000;border:none;border-radius:7px;font-weight:700;font-size:.9rem;cursor:pointer}
+.btn-gold:hover{background:var(--gold-d)}
+.gate-err{color:var(--red);font-size:.78rem;margin-top:6px}
+
+/* ADMIN PANEL */
+.admin-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.admin-tabs::-webkit-scrollbar{display:none}
+.adm-tab{padding:12px 16px;font-size:.78rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.adm-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.adm-panel{display:none;padding:18px 16px}
+.adm-panel.active{display:block}
+.adm-panel label{display:block;font-size:.78rem;font-weight:600;color:var(--text2);margin-bottom:5px;margin-top:12px}
+.adm-panel label:first-child{margin-top:0}
+.adm-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:.85rem;outline:none}
+.adm-input:focus{border-color:var(--gold)}
+.adm-textarea{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:.85rem;outline:none;resize:vertical;min-height:80px;font-family:'Inter',sans-serif}
+.adm-row{display:flex;gap:8px;margin-top:14px}
+.btn-sm{padding:8px 16px;border-radius:7px;font-size:.8rem;font-weight:700;cursor:pointer;border:none}
+.btn-sm.gold{background:var(--gold);color:#000}
+.btn-sm.gray{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-sm.red{background:var(--red);color:#fff}
+.adm-section-title{font-size:.82rem;font-weight:700;color:var(--text2);margin-bottom:10px;margin-top:16px;text-transform:uppercase;letter-spacing:.5px}
+.adm-section-title:first-child{margin-top:0}
+.footer-link-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.footer-link-row input{flex:1;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;outline:none}
+.footer-link-row input:focus{border-color:var(--gold)}
+.footer-link-row button{padding:7px 10px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.8rem}
+.add-link-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.add-link-row input{flex:1;min-width:100px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;outline:none}
+.add-link-row button{padding:7px 12px;background:var(--gold);color:#000;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.8rem}
+.article-mgmt-row{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;margin-bottom:8px}
+.article-mgmt-row img{width:56px;height:40px;object-fit:cover;border-radius:5px;flex-shrink:0}
+.article-mgmt-info{flex:1;min-width:0}
+.article-mgmt-info .a-title{font-size:.8rem;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.article-mgmt-info .a-date{font-size:.7rem;color:var(--text3)}
+.article-mgmt-row .adm-row{margin-top:6px}
+
+/* EDITOR */
+.editor-title-input{width:100%;padding:13px 16px;background:var(--bg3);border:none;border-bottom:1px solid var(--border);font-size:1rem;font-weight:700;color:var(--text);outline:none;font-family:'Inter',sans-serif}
+.editor-title-input::placeholder{color:var(--text3)}
+.toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:7px 10px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.tb-btn{background:none;border:1px solid transparent;color:var(--text);padding:4px 8px;border-radius:4px;font-size:.76rem;cursor:pointer;font-weight:600;transition:all .15s;min-width:28px;text-align:center}
+.tb-btn:hover{background:var(--border)}
+.tb-sep{width:1px;background:var(--border);margin:3px 4px}
+.tb-color{position:relative}
+.tb-color input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+select.tb-select{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:4px;font-size:.74rem;cursor:pointer;outline:none}
+.insert-panel{display:none;padding:11px 14px;border-top:1px solid var(--border);background:var(--bg3);gap:7px;flex-direction:column}
+.insert-panel.open{display:flex}
+.insert-panel label{font-size:.76rem;color:var(--text2);font-weight:600}
+.insert-panel input[type=text],.insert-panel input[type=url]{width:100%;padding:8px 11px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.82rem;outline:none}
+.insert-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.btn-ins{padding:7px 12px;background:var(--gold);color:#000;border:none;border-radius:6px;font-weight:700;font-size:.76rem;cursor:pointer}
+.btn-can{padding:7px 12px;background:var(--border);color:var(--text);border:none;border-radius:6px;font-weight:600;font-size:.76rem;cursor:pointer}
+.editor-area{min-height:240px;padding:13px 15px;color:var(--text);font-family:'Inter',sans-serif;font-size:.92rem;line-height:1.75;outline:none;overflow-y:auto}
+.editor-area:empty::before{content:'Write your article here...';color:var(--text3);pointer-events:none}
+.editor-area img{max-width:100%;border-radius:7px;margin:8px 0}
+.editor-area a{color:var(--gold)}
+.editor-area blockquote{border-left:3px solid var(--gold);padding-left:12px;color:var(--text2);font-style:italic;margin:12px 0}
+.meta-fields{padding:11px 15px;border-top:1px solid var(--border);display:flex;gap:9px;flex-wrap:wrap}
+.meta-fields select,.meta-fields input{padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;outline:none;flex:1;min-width:110px}
+.editor-footer{padding:11px 15px;border-top:1px solid var(--border);display:flex;gap:9px;justify-content:flex-end}
+.btn-publish{padding:9px 22px;background:var(--gold);color:#000;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.88rem}
+.btn-draft-btn{padding:9px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;font-weight:600;cursor:pointer;font-size:.88rem}
+
+/* CUSTOMIZE */
+.color-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.color-row label{font-size:.8rem;color:var(--text2);flex:1}
+.color-row input[type=color]{width:36px;height:28px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:none;padding:2px}
+.font-preview{font-size:.82rem;color:var(--text2);padding:8px 12px;background:var(--bg3);border-radius:6px;margin-top:8px;line-height:1.6}
+
+/* ═══ DRAWER (enhanced) ═══ */
+.scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300}
+.scrim.open{display:block}
+.drawer{
+  display:none;position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;
+  background:var(--bg2);border-right:1px solid var(--border);z-index:310;
+  flex-direction:column;overflow-y:auto;
+}
+.drawer.open{display:flex}
+
+/* Drawer Header / User Profile */
+.drawer-header{
+  padding:18px 16px 14px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,var(--bg3),var(--bg2));
+}
+.drawer-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.drawer-logo{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;letter-spacing:.2px;color:var(--text);display:flex;align-items:center;gap:6px}
+.drawer-logo span{color:var(--gold);font-style:italic;font-weight:700}
+.drawer-close-btn{background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;padding:4px}
+.user-profile{display:flex;align-items:center;gap:11px}
+.user-avatar{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:900;color:#000;flex-shrink:0;
+}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:.88rem;font-weight:700;color:var(--text)}
+.user-status{font-size:.72rem;color:var(--text3);margin-top:2px}
+.user-stats{display:flex;gap:14px;margin-top:12px}
+.user-stat{text-align:center}
+.user-stat-num{font-size:.9rem;font-weight:800;color:var(--gold)}
+.user-stat-lbl{font-size:.65rem;color:var(--text3);margin-top:1px}
+
+/* Drawer Nav */
+.drawer-nav{padding:10px 0}
+.drawer-nav-label{font-size:.64rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:10px 16px 4px}
+.drawer-item{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 16px;color:var(--text);text-decoration:none;
+  font-size:.88rem;font-weight:600;cursor:pointer;border:none;background:none;
+  width:100%;text-align:left;transition:background .15s;
+}
+.drawer-item:hover{background:var(--bg3);color:var(--gold)}
+.drawer-item svg{flex-shrink:0;opacity:.7}
+.drawer-item:hover svg{opacity:1}
+.drawer-item .badge{
+  margin-left:auto;background:var(--gold);color:#000;
+  font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:10px;
+}
+.drawer-divider{border:none;border-top:1px solid var(--border);margin:4px 0}
+
+/* Drawer sub-panel */
+.drawer-sub{
+  display:none;padding:0 16px 10px;
+}
+.drawer-sub.open{display:block}
+.drawer-sub-title{font-size:.7rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;margin-top:4px}
+.drawer-mini-card{
+  display:flex;gap:9px;align-items:center;
+  padding:8px;background:var(--bg3);border-radius:7px;
+  margin-bottom:6px;cursor:pointer;transition:background .15s;border:1px solid transparent;
+}
+.drawer-mini-card:hover{border-color:var(--gold)}
+.drawer-mini-card img{width:44px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0}
+.drawer-mini-card-body{flex:1;min-width:0}
+.drawer-mini-title{font-size:.76rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.drawer-mini-meta{font-size:.65rem;color:var(--text3);margin-top:2px}
+.drawer-empty{font-size:.78rem;color:var(--text3);text-align:center;padding:14px 0;font-style:italic}
+.drawer-clear-btn{font-size:.72rem;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 0;display:block;margin:4px auto 0}
+
+/* Logout */
+.drawer-logout{
+  margin-top:auto;border-top:1px solid var(--border);
+  padding:10px 0;
+}
+.drawer-logout-btn{
+  display:flex;align-items:center;gap:11px;
+  padding:12px 16px;color:var(--red);font-size:.88rem;font-weight:600;
+  cursor:pointer;background:none;border:none;width:100%;text-align:left;transition:background .15s;
+}
+.drawer-logout-btn:hover{background:rgba(229,62,62,.08)}
+
+/* TOAST */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;padding:9px 18px;border-radius:8px;font-weight:700;font-size:.8rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* ADMIN BADGE */
+.admin-badge{position:fixed;bottom:18px;right:14px;z-index:400;background:var(--bg2);border:1px solid var(--gold);border-radius:10px;padding:7px 12px;display:none;flex-direction:column;gap:5px;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.admin-badge.visible{display:flex}
+.admin-badge-label{font-size:.64rem;font-weight:700;color:var(--gold);letter-spacing:.6px;text-transform:uppercase;margin-bottom:2px}
+.admin-action{display:flex;align-items:center;gap:7px;background:none;border:none;color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;padding:5px 8px;border-radius:6px;transition:background .2s;text-align:left;width:100%}
+.admin-action:hover{background:var(--bg3)}
+.admin-action svg{flex-shrink:0}
+
+@media(min-width:600px){
+  .footer-grid{grid-template-columns:repeat(4,1fr)}
+  .similar-grid{flex-direction:row;flex-wrap:wrap}
+  .similar-card{flex:0 0 calc(50% - 6px)}
+}
+</style>
+</head>
+<body>
+
+<!-- SCRIM -->
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+
+<!-- ══════ DRAWER ══════ -->
+<div class="drawer" id="drawer">
+
+  <!-- Profile Header -->
+  <div class="drawer-header">
+    <div class="drawer-top-row">
+      <div class="drawer-logo"><svg class="logo-icon" width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 14 L20 27 L9 24 Z" fill="var(--gold)"/><path d="M50 14 L44 27 L55 24 Z" fill="var(--gold)"/><circle cx="32" cy="34" r="20" fill="var(--gold)"/><rect x="4" y="30" width="56" height="5" rx="2.5" fill="#0F1117"/><circle cx="22" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="22" cy="32" r="4" fill="var(--gold)"/><circle cx="42" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="42" cy="32" r="4" fill="var(--gold)"/><path d="M32 40 L28 48 L36 48 Z" fill="#0F1117"/></svg>Owl<span>Economics</span></div>
+      <button class="drawer-close-btn" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="user-profile">
+      <div class="user-avatar" id="drawerAvatar">R</div>
+      <div class="user-info">
+        <div class="user-name" id="drawerUsername">Reader</div>
+        <div class="user-status" id="drawerStatus">● Active now</div>
+      </div>
+    </div>
+    <div class="user-stats">
+      <div class="user-stat">
+        <div class="user-stat-num" id="statRead">0</div>
+        <div class="user-stat-lbl">Read</div>
+      </div>
+      <div class="user-stat">
+        <div class="user-stat-num" id="statSaved">0</div>
+        <div class="user-stat-lbl">Saved</div>
+      </div>
+      <div class="user-stat">
+        <div class="user-stat-num" id="statHistory">0</div>
+        <div class="user-stat-lbl">History</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="drawer-nav">
+    <div class="drawer-nav-label">Browse</div>
+    <div id="drawerCats"></div>
+  </div>
+
+  <hr class="drawer-divider">
+
+  <!-- My Library -->
+  <div class="drawer-nav">
+    <div class="drawer-nav-label">My Library</div>
+
+    <!-- Visited Blogs -->
+    <button class="drawer-item" onclick="toggleDrawerSub('subVisited')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Visited Blogs
+      <span class="badge" id="badgeVisited">0</span>
+    </button>
+    <div class="drawer-sub" id="subVisited">
+      <div class="drawer-sub-title">Recently Visited</div>
+      <div id="visitedList"><div class="drawer-empty">No visited blogs yet</div></div>
+      <button class="drawer-clear-btn" onclick="clearVisited()">Clear visited</button>
+    </div>
+
+    <!-- Saved Blogs -->
+    <button class="drawer-item" onclick="toggleDrawerSub('subSaved')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      Saved Blogs
+      <span class="badge" id="badgeSaved">0</span>
+    </button>
+    <div class="drawer-sub" id="subSaved">
+      <div class="drawer-sub-title">Bookmarked Articles</div>
+      <div id="savedList"><div class="drawer-empty">No saved blogs yet</div></div>
+      <button class="drawer-clear-btn" onclick="clearSaved()">Clear all saved</button>
+    </div>
+
+    <!-- History -->
+    <button class="drawer-item" onclick="toggleDrawerSub('subHistory')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      History
+      <span class="badge" id="badgeHistory">0</span>
+    </button>
+    <div class="drawer-sub" id="subHistory">
+      <div class="drawer-sub-title">Reading History</div>
+      <div id="historyList"><div class="drawer-empty">No history yet</div></div>
+      <button class="drawer-clear-btn" onclick="clearHistory()">Clear history</button>
+    </div>
+  </div>
+
+  <!-- Logout -->
+  <div class="drawer-logout">
+    <button class="drawer-logout-btn" onclick="handleLogout()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out / Clear Session
+    </button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="topnav">
+  <button class="nav-btn" onclick="openDrawer()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <span class="nav-logo" onclick="goHome()"><svg class="logo-icon" width="26" height="26" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 14 L20 27 L9 24 Z" fill="var(--gold)"/><path d="M50 14 L44 27 L55 24 Z" fill="var(--gold)"/><circle cx="32" cy="34" r="20" fill="var(--gold)"/><rect x="4" y="30" width="56" height="5" rx="2.5" fill="#0F1117"/><circle cx="22" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="22" cy="32" r="4" fill="var(--gold)"/><circle cx="42" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="42" cy="32" r="4" fill="var(--gold)"/><path d="M32 40 L28 48 L36 48 Z" fill="#0F1117"/></svg>Owl<span>Economics</span></span>
+  <button class="nav-btn" id="themeBtn" onclick="toggleTheme()">
+    <svg id="moonIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+    <svg id="sunIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+  <button class="admin-btn" id="adminNavBtn" onclick="openAdminGate()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span id="adminBtnLabel">Admin</span>
+  </button>
+</nav>
+
+<!-- FLOATING CATEGORIES -->
+<div class="float-cats" id="ribbonCats"></div>
+
+<!-- HOME VIEW -->
+<div class="view active" id="homeView">
+  <div class="search-wrap">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search articles..." oninput="doSearch()">
+      <button onclick="doSearch()">Go</button>
+    </div>
+  </div>
+  <div class="feed-wrap">
+    <div class="section-label">THIS WEEK</div>
+    <div class="thumb-row" id="thumbRow"></div>
+    <div id="articleList"></div>
+    <div class="pagination">
+      <button class="page-btn" id="prevBtn" onclick="changePage(-1)">PREV</button>
+      <span class="page-info"><span id="curPage">1</span> / <span id="totPages">1</span></span>
+      <button class="page-btn" id="nextBtn" onclick="changePage(1)">NEXT</button>
+    </div>
+  </div>
+  <section class="newsletter">
+    <h2 id="nlTitle">STAY AHEAD OF THE CURVE</h2>
+    <p id="nlSub">Get the latest commerce intelligence delivered to your inbox.</p>
+    <input type="email" id="emailInput" placeholder="Your email address">
+    <button onclick="subscribe()">SUBSCRIBE</button>
+  </section>
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo"><svg class="logo-icon" width="22" height="22" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 14 L20 27 L9 24 Z" fill="var(--gold)"/><path d="M50 14 L44 27 L55 24 Z" fill="var(--gold)"/><circle cx="32" cy="34" r="20" fill="var(--gold)"/><rect x="4" y="30" width="56" height="5" rx="2.5" fill="#0F1117"/><circle cx="22" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="22" cy="32" r="4" fill="var(--gold)"/><circle cx="42" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="42" cy="32" r="4" fill="var(--gold)"/><path d="M32 40 L28 48 L36 48 Z" fill="#0F1117"/></svg>Owl<span>Economics</span></div>
+      <div class="footer-desc" id="footerDesc"></div>
+      <div class="footer-grid" id="footerGrid"></div>
+      <div class="footer-bottom" id="footerBottom"></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ARTICLE PAGE VIEW -->
+<div class="view" id="articlePageView">
+  <div class="art-page-wrap">
+    <button class="back-btn" onclick="goHome()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Feed
+    </button>
+    <img class="art-hero" id="apHero" src="" alt="">
+    <div class="art-page-meta" id="apMeta"></div>
+    <div class="art-page-title" id="apTitle"></div>
+    <div class="art-save-row">
+      <button class="art-save-btn" id="artSaveBtn" onclick="toggleSaveCurrentArticle()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        Save Article
+      </button>
+    </div>
+    <div class="art-page-content" id="apContent"></div>
+    <hr class="art-page-divider">
+    <div class="similar-section-label">MORE LIKE THIS</div>
+    <div class="similar-grid" id="similarGrid"></div>
+  </div>
+  <section class="newsletter">
+    <h2 id="nlTitle2">STAY AHEAD OF THE CURVE</h2>
+    <p>Get the latest commerce intelligence delivered to your inbox.</p>
+    <input type="email" id="emailInput2" placeholder="Your email address">
+    <button onclick="subscribe2()">SUBSCRIBE</button>
+  </section>
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo"><svg class="logo-icon" width="22" height="22" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 14 L20 27 L9 24 Z" fill="var(--gold)"/><path d="M50 14 L44 27 L55 24 Z" fill="var(--gold)"/><circle cx="32" cy="34" r="20" fill="var(--gold)"/><rect x="4" y="30" width="56" height="5" rx="2.5" fill="#0F1117"/><circle cx="22" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="22" cy="32" r="4" fill="var(--gold)"/><circle cx="42" cy="32" r="10" fill="#0F1117" stroke="var(--gold)" stroke-width="2"/><circle cx="42" cy="32" r="4" fill="var(--gold)"/><path d="M32 40 L28 48 L36 48 Z" fill="#0F1117"/></svg>Owl<span>Economics</span></div>
+      <div class="footer-desc" id="footerDesc2"></div>
+      <div class="footer-grid" id="footerGrid2"></div>
+      <div class="footer-bottom" id="footerBottom2"></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ADMIN FLOATING BADGE -->
+<div class="admin-badge" id="adminBadge">
+  <div class="admin-badge-label">⚡ Admin Mode</div>
+  <button class="admin-action" onclick="openEditor()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Write Article
+  </button>
+  <button class="admin-action" onclick="openAdminPanel('customize')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Customize Site
+  </button>
+  <button class="admin-action" onclick="openAdminPanel('articles')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Manage Articles
+  </button>
+  <button class="admin-action" onclick="openAdminPanel('footer')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Edit Footer Links
+  </button>
+  <button class="admin-action" onclick="openAdminPanel('settings')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Settings / Password
+  </button>
+  <button class="admin-action" style="color:var(--red)" onclick="logoutAdmin()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Admin Logout
+  </button>
+</div>
+
+<!-- ADMIN GATE -->
+<div class="overlay" id="gateOverlay">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-hdr">
+      <h2>🔐 Admin Access</h2>
+      <button class="btn-close" onclick="closeOverlay('gateOverlay')">✕</button>
+    </div>
+    <div class="admin-gate">
+      <h3>Enter Admin Password</h3>
+      <p>Admin access is required to write articles and manage this site.</p>
+      <input class="gate-input" type="password" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()">
+      <button class="btn-gold" onclick="checkPw()">Unlock Admin</button>
+      <div class="gate-err" id="gateErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="overlay" id="adminOverlay">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>⚡ Admin Panel</h2>
+      <button class="btn-close" onclick="closeOverlay('adminOverlay')">✕</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="adm-tab active" onclick="switchAdmTab('customize')">Customize</button>
+      <button class="adm-tab" onclick="switchAdmTab('articles')">Articles</button>
+      <button class="adm-tab" onclick="switchAdmTab('footer')">Footer Links</button>
+      <button class="adm-tab" onclick="switchAdmTab('settings')">Settings</button>
+    </div>
+    <div class="adm-panel active" id="adm-customize">
+      <div class="adm-section-title">Site Identity</div>
+      <label>Site Name</label><input class="adm-input" id="custSiteName" value="OwlEconomics">
+      <label>Tagline / Description</label><textarea class="adm-textarea" id="custTagline">Sharp-eyed insight on trade, technology, and Web3.</textarea>
+      <label>Footer Copyright Text</label><input class="adm-input" id="custCopyright" value="© 2026 OwlEconomics. All rights reserved. Built for the future of digital commerce.">
+      <div class="adm-section-title" style="margin-top:18px">Newsletter</div>
+      <label>Newsletter Heading</label><input class="adm-input" id="custNlTitle" value="STAY AHEAD OF THE CURVE">
+      <label>Newsletter Subtext</label><input class="adm-input" id="custNlSub" value="Get the latest commerce intelligence delivered to your inbox.">
+      <div class="adm-section-title" style="margin-top:18px">Brand Colors</div>
+      <div class="color-row"><label>Accent / Gold</label><input type="color" id="colorGold" value="#F5C518" onchange="applyColor('--gold',this.value)"></div>
+      <div class="color-row"><label>Background</label><input type="color" id="colorBg" value="#0F1117" onchange="applyColor('--bg',this.value)"></div>
+      <div class="color-row"><label>Card Background</label><input type="color" id="colorCard" value="#181B28" onchange="applyColor('--card',this.value)"></div>
+      <div class="adm-section-title" style="margin-top:18px">Font Style</div>
+      <label>Body Font</label>
+      <select class="adm-input" id="custFont" onchange="applyFont(this.value)">
+        <option value="Inter">Inter (Default)</option>
+        <option value="Georgia">Georgia (Serif)</option>
+        <option value="'Courier New'">Courier New (Mono)</option>
+        <option value="Arial">Arial</option>
+        <option value="'Times New Roman'">Times New Roman</option>
+      </select>
+      <div class="font-preview" id="fontPreview">The quick brown fox jumps over the lazy dog. Commerce intelligence for the modern world.</div>
+      <div class="adm-row">
+        <button class="btn-sm gold" onclick="applyCustomize()">Save Changes</button>
+        <button class="btn-sm gray" onclick="resetCustomize()">Reset Defaults</button>
+      </div>
+      <div class="adm-section-title" style="margin-top:18px">Ribbon Categories</div>
+      <div style="font-size:.75rem;color:var(--text3);margin-bottom:10px">Add or remove categories shown in the ribbon bar and article editor. "LATEST" is always first.</div>
+      <div id="catMgmtList" style="margin-bottom:10px"></div>
+      <div class="footer-link-row" style="margin-bottom:10px">
+        <input type="text" id="newCatInput" placeholder="New category (e.g. MARKETS)" style="flex:1;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;outline:none;text-transform:uppercase">
+        <button onclick="addCategory()" style="padding:7px 12px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:700">+ Add</button>
+      </div>
+    </div>
+    <div class="adm-panel" id="adm-articles">
+      <div class="adm-section-title">Published Articles</div>
+      <div id="articleMgmtList"></div>
+      <div class="adm-row"><button class="btn-sm gold" onclick="closeOverlay('adminOverlay');openEditor()">+ New Article</button></div>
+    </div>
+    <div class="adm-panel" id="adm-footer">
+      <div class="adm-section-title">Company Links</div>
+      <div id="footerCompanyLinks"></div>
+      <div class="add-link-row">
+        <input type="text" id="newCompanyLabel" placeholder="Label (e.g. About Us)">
+        <input type="url" id="newCompanyUrl" placeholder="URL (https://...)">
+        <button onclick="addFooterLink('company')">+ Add</button>
+      </div>
+      <div class="adm-section-title">Resources Links</div>
+      <div id="footerResourceLinks"></div>
+      <div class="add-link-row">
+        <input type="text" id="newResourceLabel" placeholder="Label">
+        <input type="url" id="newResourceUrl" placeholder="URL">
+        <button onclick="addFooterLink('resources')">+ Add</button>
+      </div>
+      <div class="adm-section-title">Social Links</div>
+      <div id="footerSocialLinks"></div>
+      <div class="add-link-row">
+        <input type="text" id="newSocialLabel" placeholder="Platform name">
+        <input type="url" id="newSocialUrl" placeholder="URL">
+        <button onclick="addFooterLink('social')">+ Add</button>
+      </div>
+      <div class="adm-row"><button class="btn-sm gold" onclick="saveFooterLinks()">Save Footer Links</button></div>
+    </div>
+    <div class="adm-panel" id="adm-settings">
+      <div class="adm-section-title">Change Admin Password</div>
+      <label>Current Password</label><input class="adm-input" type="password" id="curPw" placeholder="Current password">
+      <label>New Password</label><input class="adm-input" type="password" id="newPw" placeholder="New password (min 4 chars)">
+      <label>Confirm New Password</label><input class="adm-input" type="password" id="confirmPw" placeholder="Confirm new password">
+      <div class="adm-row"><button class="btn-sm gold" onclick="changePassword()">Update Password</button></div>
+      <div id="pwChangeMsg" style="font-size:.78rem;margin-top:8px"></div>
+      <div class="adm-section-title" style="margin-top:24px">Danger Zone</div>
+      <button class="btn-sm red" onclick="if(confirm('Delete ALL articles?'))clearAllArticles()">Delete All Articles</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div class="overlay" id="editorOverlay">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="editorModalTitle">New Article</h2>
+      <button class="btn-close" onclick="closeOverlay('editorOverlay')">✕</button>
+    </div>
+    <input class="editor-title-input" id="articleTitleInput" type="text" placeholder="Article headline...">
+    <div class="toolbar">
+      <select class="tb-select" onchange="execCmd('formatBlock',this.value);this.value=''">
+        <option value="">Format</option><option value="h1">H1</option><option value="h2">H2</option>
+        <option value="h3">H3</option><option value="p">Paragraph</option><option value="blockquote">Quote</option><option value="pre">Code</option>
+      </select>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" onclick="execCmd('bold')"><b>B</b></button>
+      <button class="tb-btn" onclick="execCmd('italic')"><i>I</i></button>
+      <button class="tb-btn" onclick="execCmd('underline')"><u>U</u></button>
+      <button class="tb-btn" onclick="execCmd('strikeThrough')"><s>S</s></button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" onclick="execCmd('justifyLeft')">⬅</button>
+      <button class="tb-btn" onclick="execCmd('justifyCenter')">⬛</button>
+      <button class="tb-btn" onclick="execCmd('justifyRight')">➡</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" onclick="execCmd('insertUnorderedList')">• List</button>
+      <button class="tb-btn" onclick="execCmd('insertOrderedList')">1. List</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn tb-color">A<input type="color" id="textColor" onchange="execCmd('foreColor',this.value)" value="#F5C518"></button>
+      <button class="tb-btn tb-color">HL<input type="color" id="bgColor" onchange="execCmd('hiliteColor',this.value)" value="#F5C518"></button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" onclick="insertLink()">🔗</button>
+      <button class="tb-btn" onclick="toggleInsertPanel()">🖼</button>
+      <button class="tb-btn" onclick="execCmd('undo')">↩</button>
+      <button class="tb-btn" onclick="execCmd('redo')">↪</button>
+    </div>
+    <div class="insert-panel" id="insertPanel">
+      <label>Upload image file (any format)</label>
+      <div class="insert-row"><input type="file" id="imgFile" accept="image/*" onchange="insertImageFile()"></div>
+      <label>Or paste image URL</label>
+      <div class="insert-row">
+        <input type="url" id="imgUrl" placeholder="https://...">
+        <button class="btn-ins" onclick="insertImageUrl()">Insert</button>
+        <button class="btn-can" onclick="toggleInsertPanel()">Cancel</button>
+      </div>
+    </div>
+    <div class="editor-area" id="editorArea" contenteditable="true" spellcheck="true"></div>
+    <div class="meta-fields">
+      <select id="catSelect">
+        <option value="TRADE">Trade</option><option value="TECH">Tech</option>
+        <option value="WEB3">Web3</option><option value="CURRENCY">Currency</option>
+        <option value="STARTUPS">Startups</option><option value="TREND">Trend</option>
+      </select>
+      <input type="text" id="excerptInput" placeholder="Short excerpt (optional)">
+      <input type="url" id="coverInput" placeholder="Cover image URL (optional)">
+    </div>
+    <div class="editor-footer">
+      <button class="btn-draft-btn" onclick="saveDraft()">Save Draft</button>
+      <button class="btn-publish" onclick="publishArticle()">Publish →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+/* ── Admin auth ──────────────────────────────────────────────
+   The password itself never touches this file anymore — it's
+   checked server-side by the backend, which returns a session
+   token we keep in sessionStorage (cleared when the tab closes).
+   ──────────────────────────────────────────────────────────── */
+let isAdmin = false;
+let currentPage = 1;
+let currentCat = 'LATEST';
+let searchQuery = '';
+let editingId = null;
+let currentArticleId = null;
+const PER_PAGE = 3;
+
+// User library state
+let visitedIds = [];   // ordered, most recent first, max 20
+let savedIds = [];
+let historyLog = [];   // [{id, title, ts}] max 50
+
+const IMGS = [
+  'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=700&q=80',
+  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80',
+  'https://images.unsplash.com/photo-1516245834210-c4c142787335?w=700&q=80',
+  'https://images.unsplash.com/photo-1633158829799-96bb13e41e64?w=700&q=80',
+  'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=700&q=80',
+  'https://images.unsplash.com/photo-1551434678-e076c223a692?w=700&q=80',
+];
+
+/* ── Backend connection ──────────────────────────────────────
+   Set this to your deployed backend URL after you finish the
+   Render deployment step in README.md, e.g.
+   const API_BASE = 'https://commerceworld-backend.onrender.com';
+   ──────────────────────────────────────────────────────────── */
+const API_BASE = 'https://commerceworld-backend.onrender.com';
+
+let articles = [];
+let footerLinks = { company: [], resources: [], social: [] };
+let siteConfig = { name: 'OwlEconomics', tagline: '', copyright: '', nlTitle: '', nlSub: '', categories: ['LATEST','TREND','TRADE','TECH','CURRENCY','STARTUPS','WEB3'] };
+
+function adminToken() { return sessionStorage.getItem('cw_admin_token') || null; }
+function authHeaders() { const t = adminToken(); return t ? { 'Authorization': 'Bearer ' + t } : {}; }
+
+async function apiGet(path) {
+  const res = await fetch(API_BASE + path);
+  if (!res.ok) throw new Error('Request failed');
+  return res.json();
+}
+async function apiSend(method, path, body) {
+  const res = await fetch(API_BASE + path, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+async function loadFromServer() {
+  try {
+    const [cfg, arts, links] = await Promise.all([
+      apiGet('/api/config'),
+      apiGet('/api/articles'),
+      apiGet('/api/footer-links'),
+    ]);
+    siteConfig = { ...siteConfig, ...cfg };
+    if (cfg.categories && Array.isArray(cfg.categories)) siteConfig.categories = cfg.categories;
+    articles = arts;
+    footerLinks = links;
+  } catch (e) {
+    console.error('Could not reach backend:', e);
+    showToast('Could not load live data — check API_BASE in the code');
+  }
+  renderRibbon();
+  renderDrawerCats();
+  updateCatSelect();
+  render();
+}
+
+/* ══════════════════════════════════
+   USER LIBRARY
+══════════════════════════════════ */
+function recordVisit(article) {
+  visitedIds = visitedIds.filter(i => i !== article.id);
+  visitedIds.unshift(article.id);
+  if (visitedIds.length > 20) visitedIds = visitedIds.slice(0, 20);
+
+  // History log
+  const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  historyLog = historyLog.filter(h => h.id !== article.id);
+  historyLog.unshift({id: article.id, title: article.title, ts, date: article.date, img: article.img, cat: article.cat});
+  if (historyLog.length > 50) historyLog = historyLog.slice(0, 50);
+
+  updateLibraryUI();
+}
+
+function toggleSave(id) {
+  if (savedIds.includes(id)) {
+    savedIds = savedIds.filter(i => i !== id);
+  } else {
+    savedIds.push(id);
+  }
+  updateLibraryUI();
+  return savedIds.includes(id);
+}
+
+function toggleSaveCurrentArticle() {
+  if (!currentArticleId) return;
+  const saved = toggleSave(currentArticleId);
+  const btn = document.getElementById('artSaveBtn');
+  btn.classList.toggle('saved', saved);
+  btn.innerHTML = saved
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> Saved ✓'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> Save Article';
+  showToast(saved ? 'Saved to library ✓' : 'Removed from saved');
+  render(); // refresh card save buttons
+}
+
+function updateLibraryUI() {
+  // badges
+  document.getElementById('badgeVisited').textContent = visitedIds.length;
+  document.getElementById('badgeSaved').textContent = savedIds.length;
+  document.getElementById('badgeHistory').textContent = historyLog.length;
+  // stats row
+  document.getElementById('statRead').textContent = visitedIds.length;
+  document.getElementById('statSaved').textContent = savedIds.length;
+  document.getElementById('statHistory').textContent = historyLog.length;
+
+  // Visited list
+  const vl = document.getElementById('visitedList');
+  const visitedArticles = visitedIds.map(id => articles.find(a => a.id === id)).filter(Boolean);
+  vl.innerHTML = visitedArticles.length
+    ? visitedArticles.map(a => miniCard(a, '')).join('')
+    : '<div class="drawer-empty">No visited blogs yet</div>';
+
+  // Saved list
+  const sl = document.getElementById('savedList');
+  const savedArticles = savedIds.map(id => articles.find(a => a.id === id)).filter(Boolean);
+  sl.innerHTML = savedArticles.length
+    ? savedArticles.map(a => miniCard(a, savedIds.includes(a.id) ? '🔖 ' : '')).join('')
+    : '<div class="drawer-empty">No saved blogs yet</div>';
+
+  // History list
+  const hl = document.getElementById('historyList');
+  hl.innerHTML = historyLog.length
+    ? historyLog.map(h => `
+      <div class="drawer-mini-card" onclick="closeDrawer();openArticlePage('${h.id}')">
+        <img src="${h.img}" alt="" onerror="this.src='https://placehold.co/44x32?text=img'">
+        <div class="drawer-mini-card-body">
+          <div class="drawer-mini-title">${h.title}</div>
+          <div class="drawer-mini-meta"><span class="tag ${h.cat.toLowerCase()}" style="font-size:.58rem;padding:1px 5px">${h.cat}</span> · ${h.ts}</div>
+        </div>
+      </div>`).join('')
+    : '<div class="drawer-empty">No history yet</div>';
+}
+
+function miniCard(a, prefix) {
+  return `
+    <div class="drawer-mini-card" onclick="closeDrawer();openArticlePage('${a.id}')">
+      <img src="${a.img}" alt="" onerror="this.src='https://placehold.co/44x32?text=img'">
+      <div class="drawer-mini-card-body">
+        <div class="drawer-mini-title">${prefix}${a.title}</div>
+        <div class="drawer-mini-meta"><span class="tag ${a.cat.toLowerCase()}" style="font-size:.58rem;padding:1px 5px">${a.cat}</span> · ${a.date}</div>
+      </div>
+    </div>`;
+}
+
+function clearVisited() { visitedIds = []; updateLibraryUI(); showToast('Visited cleared'); }
+function clearSaved() { savedIds = []; updateLibraryUI(); render(); showToast('Saved list cleared'); }
+function clearHistory() { historyLog = []; updateLibraryUI(); showToast('History cleared'); }
+
+function toggleDrawerSub(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.drawer-sub').forEach(s => s.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+function handleLogout() {
+  if (!confirm('Clear your session? This will reset visited, saved, and history.')) return;
+  visitedIds = [];
+  savedIds = [];
+  historyLog = [];
+  updateLibraryUI();
+  render();
+  closeDrawer();
+  if (isAdmin) logoutAdmin();
+  showToast('Session cleared');
+}
+
+/* ══════════════════════════════════
+   VIEWS
+══════════════════════════════════ */
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+function goHome() { showView('homeView'); render(); }
+
+/* ══════════════════════════════════
+   RENDER FEED
+══════════════════════════════════ */
+function getFiltered() {
+  let list = [...articles];
+  if (searchQuery) { const q = searchQuery.toLowerCase(); list = list.filter(a => a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q)); }
+  if (currentCat !== 'LATEST') list = list.filter(a => a.cat === currentCat);
+  return list.reverse();
+}
+
+function render() {
+  renderFooter();
+  const filtered = getFiltered();
+  const total = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  if (currentPage > total) currentPage = total;
+  document.getElementById('curPage').textContent = currentPage;
+  document.getElementById('totPages').textContent = total;
+  document.getElementById('prevBtn').disabled = currentPage <= 1;
+  document.getElementById('nextBtn').disabled = currentPage >= total;
+
+  const thumbs = [...articles].reverse().slice(0, 3);
+  document.getElementById('thumbRow').innerHTML = thumbs.map(a => `
+    <div class="thumb-card" onclick="openArticlePage('${a.id}')">
+      <img src="${a.img}" alt="${a.title}" onerror="this.src='https://placehold.co/138x86?text=img'">
+      <div class="thumb-title">${a.title}</div>
+    </div>`).join('');
+
+  const start = (currentPage - 1) * PER_PAGE;
+  const page = filtered.slice(start, start + PER_PAGE);
+  document.getElementById('articleList').innerHTML = page.length
+    ? page.map(a => {
+        const isSaved = savedIds.includes(a.id);
+        return `
+        <div class="article-card" onclick="openArticlePage('${a.id}')">
+          <img src="${a.img}" alt="${a.title}" onerror="this.src='https://placehold.co/700x195?text=img'">
+          <button class="save-btn ${isSaved?'saved':''}" onclick="event.stopPropagation();cardToggleSave(${a.id},this)" title="${isSaved?'Unsave':'Save'}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="${isSaved?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          </button>
+          <div class="a-body">
+            <div class="a-meta"><span class="tag ${a.cat.toLowerCase()}">${a.cat}</span><span class="a-date">${a.date}</span></div>
+            <div class="a-title">${a.title}</div>
+            <div class="a-excerpt">${a.excerpt}</div>
+            <span class="read-more">READ MORE →</span>
+          </div>
+        </div>`;}).join('')
+    : '<p style="text-align:center;color:var(--text3);padding:40px 0">No articles found.</p>';
+
+  document.getElementById('nlTitle').textContent = siteConfig.nlTitle;
+  document.getElementById('nlSub').textContent = siteConfig.nlSub;
+}
+
+function cardToggleSave(id, btn) {
+  const saved = toggleSave(id);
+  btn.classList.toggle('saved', saved);
+  btn.querySelector('svg').setAttribute('fill', saved ? 'currentColor' : 'none');
+  btn.title = saved ? 'Unsave' : 'Save';
+  showToast(saved ? 'Saved ✓' : 'Removed from saved');
+}
+
+function changePage(dir) {
+  const filtered = getFiltered();
+  const total = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  currentPage = Math.max(1, Math.min(total, currentPage + dir));
+  render();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function renderRibbon() {
+  const cats = siteConfig.categories || ['LATEST'];
+  document.getElementById('ribbonCats').innerHTML = cats.map(c =>
+    `<button class="cat-tab${c === currentCat ? ' active' : ''}" onclick="filterCat('${c}')">${c}</button>`
+  ).join('');
+}
+function renderDrawerCats() {
+  const cats = siteConfig.categories || ['LATEST'];
+  const icon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>`;
+  document.getElementById('drawerCats').innerHTML = cats.map(c =>
+    `<button class="drawer-item" onclick="filterCat('${c}');closeDrawer()">${icon} ${c.charAt(0)+c.slice(1).toLowerCase()}</button>`
+  ).join('');
+}
+function updateCatSelect() {
+  const sel = document.getElementById('catSelect');
+  if (!sel) return;
+  const cats = (siteConfig.categories || []).filter(c => c !== 'LATEST');
+  const cur = sel.value;
+  sel.innerHTML = cats.map(c => `<option value="${c}">${c.charAt(0)+c.slice(1).toLowerCase()}</option>`).join('');
+  if (cats.includes(cur)) sel.value = cur;
+}
+function filterCat(cat) {
+  currentCat = cat; currentPage = 1;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.textContent === cat));
+  if (document.getElementById('homeView').classList.contains('active')) render();
+  else { showView('homeView'); render(); }
+}
+
+function doSearch() {
+  searchQuery = document.getElementById('searchInput').value.trim();
+  currentPage = 1; render();
+}
+
+/* ══════════════════════════════════
+   ARTICLE PAGE
+══════════════════════════════════ */
+function openArticlePage(id) {
+  const a = articles.find(x => x.id === id); if (!a) return;
+  currentArticleId = id;
+  recordVisit(a);
+
+  document.getElementById('apHero').src = a.img;
+  document.getElementById('apHero').alt = a.title;
+  document.getElementById('apMeta').innerHTML = `<span class="tag ${a.cat.toLowerCase()}">${a.cat}</span><span class="a-date">${a.date}</span>`;
+  document.getElementById('apTitle').textContent = a.title;
+  document.getElementById('apContent').innerHTML = a.content;
+
+  const isSaved = savedIds.includes(id);
+  const saveBtn = document.getElementById('artSaveBtn');
+  saveBtn.classList.toggle('saved', isSaved);
+  saveBtn.innerHTML = isSaved
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> Saved ✓'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> Save Article';
+
+  const similar = articles.filter(x => x.id !== id && x.cat === a.cat).slice(0, 4);
+  const fill = articles.filter(x => x.id !== id && !similar.includes(x)).reverse().slice(0, 4 - similar.length);
+  const all = [...similar, ...fill];
+  document.getElementById('similarGrid').innerHTML = all.map(s => `
+    <div class="similar-card" onclick="openArticlePage('${s.id}')">
+      <img src="${s.img}" alt="${s.title}" onerror="this.src='https://placehold.co/80x56?text=img'">
+      <div class="similar-card-body">
+        <div class="a-title">${s.title}</div>
+        <span class="tag ${s.cat.toLowerCase()}" style="font-size:.62rem;padding:2px 6px">${s.cat}</span>
+        <div class="a-date" style="margin-top:4px">${s.date}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('nlTitle2').textContent = siteConfig.nlTitle;
+  renderFooter2();
+  showView('articlePageView');
+}
+
+/* ══════════════════════════════════
+   FOOTER
+══════════════════════════════════ */
+function buildFooterHTML() {
+  const comp = footerLinks.company.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join('');
+  const res = footerLinks.resources.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join('');
+  const cats = ['Tech','Trade','Web3','Currency'].map(c => `<a href="#" onclick="filterCat('${c.toUpperCase()}');return false">${c}</a>`).join('');
+  const soc = footerLinks.social.map(l => `<a href="${l.url}" target="_blank" rel="noopener" class="social-link">${l.label}</a>`).join('');
+  return `<div class="footer-col"><h4>COMPANY</h4>${comp}</div><div class="footer-col"><h4>RESOURCES</h4>${res}</div><div class="footer-col"><h4>CATEGORIES</h4>${cats}</div><div class="footer-col"><h4>FOLLOW</h4>${soc}</div>`;
+}
+function renderFooter() {
+  const g = document.getElementById('footerGrid'); if(g) g.innerHTML = buildFooterHTML();
+  const d = document.getElementById('footerDesc'); if(d) d.innerHTML = siteConfig.tagline.replace(/\n/g,'<br>');
+  const b = document.getElementById('footerBottom'); if(b) b.textContent = siteConfig.copyright;
+}
+function renderFooter2() {
+  const g = document.getElementById('footerGrid2'); if(g) g.innerHTML = buildFooterHTML();
+  const d = document.getElementById('footerDesc2'); if(d) d.innerHTML = siteConfig.tagline.replace(/\n/g,'<br>');
+  const b = document.getElementById('footerBottom2'); if(b) b.textContent = siteConfig.copyright;
+}
+
+/* ══════════════════════════════════
+   ADMIN AUTH
+══════════════════════════════════ */
+function openAdminGate() {
+  if (isAdmin) { openAdminPanel('customize'); return; }
+  document.getElementById('pwInput').value = '';
+  document.getElementById('gateErr').textContent = '';
+  openOverlay('gateOverlay');
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+}
+async function checkPw() {
+  const v = document.getElementById('pwInput').value;
+  try {
+    const data = await apiSend('POST', '/api/login', { password: v });
+    sessionStorage.setItem('cw_admin_token', data.token);
+    isAdmin = true;
+    closeOverlay('gateOverlay');
+    document.getElementById('adminBadge').classList.add('visible');
+    document.getElementById('adminNavBtn').classList.add('active-admin');
+    document.getElementById('adminBtnLabel').textContent = 'Admin ✓';
+    showToast('Admin access granted ✓');
+  } catch (e) {
+    document.getElementById('gateErr').textContent = e.message;
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+function logoutAdmin() {
+  isAdmin = false;
+  sessionStorage.removeItem('cw_admin_token');
+  document.getElementById('adminBadge').classList.remove('visible');
+  document.getElementById('adminNavBtn').classList.remove('active-admin');
+  document.getElementById('adminBtnLabel').textContent = 'Admin';
+  showToast('Admin logged out');
+}
+async function changePassword() {
+  const cur = document.getElementById('curPw').value;
+  const nw = document.getElementById('newPw').value;
+  const conf = document.getElementById('confirmPw').value;
+  const msg = document.getElementById('pwChangeMsg');
+  if (nw.length < 4) { msg.style.color='var(--red)'; msg.textContent='Min 4 characters.'; return; }
+  if (nw !== conf) { msg.style.color='var(--red)'; msg.textContent='Passwords do not match.'; return; }
+  try {
+    await apiSend('POST', '/api/change-password', { currentPassword: cur, newPassword: nw });
+    ['curPw','newPw','confirmPw'].forEach(id => document.getElementById(id).value = '');
+    msg.style.color = 'var(--green)'; msg.textContent = 'Password updated!';
+  } catch (e) {
+    msg.style.color='var(--red)'; msg.textContent = e.message;
+  }
+}
+
+/* ══════════════════════════════════
+   ADMIN PANEL
+══════════════════════════════════ */
+function openAdminPanel(tab) {
+  if (!isAdmin) { openAdminGate(); return; }
+  populateAdminPanel(); openOverlay('adminOverlay'); switchAdmTab(tab || 'customize');
+}
+function switchAdmTab(tab) {
+  const tabs = ['customize','articles','footer','settings'];
+  document.querySelectorAll('.adm-tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.adm-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('adm-' + tab).classList.add('active');
+}
+function renderCatMgmt() {
+  const cats = siteConfig.categories || [];
+  document.getElementById('catMgmtList').innerHTML = cats.map((c, i) =>
+    `<div class="footer-link-row">
+      <span style="flex:1;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-weight:700;color:var(--gold)">${c}</span>
+      ${c === 'LATEST' ? '<span style="padding:7px 10px;font-size:.75rem;color:var(--text3)">default</span>' : `<button onclick="removeCategory(${i})" style="padding:7px 10px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.8rem">✕</button>`}
+    </div>`
+  ).join('');
+}
+function addCategory() {
+  const inp = document.getElementById('newCatInput');
+  const val = inp.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (!val) { showToast('Enter a category name'); return; }
+  if (siteConfig.categories.includes(val)) { showToast('Category already exists'); return; }
+  siteConfig.categories.push(val);
+  inp.value = '';
+  renderCatMgmt();
+  renderRibbon();
+  renderDrawerCats();
+  updateCatSelect();
+}
+function removeCategory(i) {
+  const cat = siteConfig.categories[i];
+  if (cat === 'LATEST') { showToast('Cannot remove LATEST'); return; }
+  if (!confirm(`Remove "${cat}" category?`)) return;
+  siteConfig.categories.splice(i, 1);
+  if (currentCat === cat) { currentCat = 'LATEST'; }
+  renderCatMgmt();
+  renderRibbon();
+  renderDrawerCats();
+  updateCatSelect();
+}
+function populateAdminPanel() {
+  document.getElementById('custSiteName').value = siteConfig.name;
+  document.getElementById('custTagline').value = siteConfig.tagline;
+  document.getElementById('custCopyright').value = siteConfig.copyright;
+  document.getElementById('custNlTitle').value = siteConfig.nlTitle;
+  document.getElementById('custNlSub').value = siteConfig.nlSub;
+  renderCatMgmt();
+  document.getElementById('articleMgmtList').innerHTML = [...articles].reverse().map(a => `
+    <div class="article-mgmt-row">
+      <img src="${a.img}" alt="${a.title}" onerror="this.src='https://placehold.co/56x40?text=img'">
+      <div class="article-mgmt-info">
+        <div class="a-title">${a.title}</div>
+        <div class="a-date"><span class="tag ${a.cat.toLowerCase()}" style="font-size:.6rem;padding:2px 5px">${a.cat}</span> ${a.date}</div>
+        <div class="adm-row">
+          <button class="btn-sm gray" onclick="editArticle('${a.id}')">Edit</button>
+          <button class="btn-sm red" onclick="deleteArticle('${a.id}')">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+  renderFooterLinkEditor('company','footerCompanyLinks');
+  renderFooterLinkEditor('resources','footerResourceLinks');
+  renderFooterLinkEditor('social','footerSocialLinks');
+}
+async function applyCustomize() {
+  siteConfig.name = document.getElementById('custSiteName').value;
+  siteConfig.tagline = document.getElementById('custTagline').value;
+  siteConfig.copyright = document.getElementById('custCopyright').value;
+  siteConfig.nlTitle = document.getElementById('custNlTitle').value;
+  siteConfig.nlSub = document.getElementById('custNlSub').value;
+  try {
+    await apiSend('PUT', '/api/config', siteConfig);
+    renderRibbon(); renderDrawerCats(); updateCatSelect(); render();
+    showToast('Changes saved!');
+  }
+  catch (e) { showToast('Save failed: ' + e.message); }
+}
+async function resetCustomize() {
+  siteConfig = {name:'OwlEconomics',tagline:'Sharp-eyed insight on trade, technology, and Web3.',copyright:'© 2026 OwlEconomics. All rights reserved. Built for the future of digital commerce.',nlTitle:'STAY AHEAD OF THE CURVE',nlSub:'Get the latest commerce intelligence delivered to your inbox.',categories:['LATEST','TREND','TRADE','TECH','CURRENCY','STARTUPS','WEB3']};
+  try { await apiSend('PUT', '/api/config', siteConfig); populateAdminPanel(); renderRibbon(); renderDrawerCats(); updateCatSelect(); render(); showToast('Reset to defaults'); }
+  catch (e) { showToast('Save failed: ' + e.message); }
+}
+function applyColor(v,val){document.documentElement.style.setProperty(v,val)}
+function applyFont(font){document.body.style.fontFamily=font+',sans-serif';document.getElementById('fontPreview').style.fontFamily=font+',sans-serif'}
+async function deleteArticle(id){
+  if(!confirm('Delete this article?'))return;
+  try { await apiSend('DELETE', '/api/articles/' + id); articles=articles.filter(a=>a.id!==id); populateAdminPanel(); render(); showToast('Article deleted'); }
+  catch (e) { showToast('Delete failed: ' + e.message); }
+}
+function editArticle(id){const a=articles.find(x=>x.id===id);if(!a)return;editingId=id;document.getElementById('editorModalTitle').textContent='Edit Article';document.getElementById('articleTitleInput').value=a.title;document.getElementById('editorArea').innerHTML=a.content;document.getElementById('catSelect').value=a.cat;document.getElementById('excerptInput').value=a.excerpt;document.getElementById('coverInput').value=a.img;closeOverlay('adminOverlay');openOverlay('editorOverlay')}
+async function clearAllArticles(){
+  if(!confirm('Delete ALL articles? This cannot be undone.'))return;
+  try { await Promise.all(articles.map(a => apiSend('DELETE', '/api/articles/' + a.id))); articles=[]; populateAdminPanel(); render(); showToast('All articles deleted'); }
+  catch (e) { showToast('Delete failed: ' + e.message); }
+}
+function renderFooterLinkEditor(section,containerId){document.getElementById(containerId).innerHTML=footerLinks[section].map((l,i)=>`<div class="footer-link-row"><input type="text" value="${l.label}" oninput="footerLinks['${section}'][${i}].label=this.value" placeholder="Label"><input type="url" value="${l.url}" oninput="footerLinks['${section}'][${i}].url=this.value" placeholder="URL"><button onclick="removeFooterLink('${section}',${i})">✕</button></div>`).join('')}
+function removeFooterLink(section,i){footerLinks[section].splice(i,1);renderFooterLinkEditor(section,`footer${section.charAt(0).toUpperCase()+section.slice(1)}Links`)}
+function addFooterLink(section){const lId='new'+section.charAt(0).toUpperCase()+section.slice(1)+'Label';const uId='new'+section.charAt(0).toUpperCase()+section.slice(1)+'Url';const label=document.getElementById(lId).value.trim();const url=document.getElementById(uId).value.trim()||'#';if(!label){showToast('Enter a label');return;}footerLinks[section].push({label,url});document.getElementById(lId).value='';document.getElementById(uId).value='';renderFooterLinkEditor(section,`footer${section.charAt(0).toUpperCase()+section.slice(1)}Links`)}
+async function saveFooterLinks(){
+  try { await apiSend('PUT', '/api/footer-links', footerLinks); renderFooter(); renderFooter2(); closeOverlay('adminOverlay'); showToast('Footer links saved!'); }
+  catch (e) { showToast('Save failed: ' + e.message); }
+}
+
+/* ══════════════════════════════════
+   EDITOR
+══════════════════════════════════ */
+function openEditor(){if(!isAdmin){openAdminGate();return;}editingId=null;document.getElementById('editorModalTitle').textContent='New Article';document.getElementById('articleTitleInput').value='';document.getElementById('editorArea').innerHTML='';document.getElementById('excerptInput').value='';document.getElementById('coverInput').value='';openOverlay('editorOverlay');setTimeout(()=>document.getElementById('articleTitleInput').focus(),100)}
+let savedRange=null;
+document.addEventListener('selectionchange',()=>{const ea=document.getElementById('editorArea');const sel=window.getSelection();if(ea&&sel&&sel.rangeCount>0&&ea.contains(sel.anchorNode))savedRange=sel.getRangeAt(0).cloneRange()});
+function restoreRange(){if(!savedRange)return;const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedRange)}
+function execCmd(cmd,val){restoreRange();document.execCommand(cmd,false,val||null);document.getElementById('editorArea').focus()}
+function insertLink(){const url=prompt('Enter URL:','https://');if(url)execCmd('createLink',url)}
+function toggleInsertPanel(){document.getElementById('insertPanel').classList.toggle('open')}
+function insertImageFile(){const file=document.getElementById('imgFile').files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{restoreRange();document.execCommand('insertImage',false,e.target.result);toggleInsertPanel();document.getElementById('imgFile').value=''};reader.readAsDataURL(file)}
+function insertImageUrl(){const url=document.getElementById('imgUrl').value.trim();if(!url)return;restoreRange();document.execCommand('insertImage',false,url);document.getElementById('imgUrl').value='';toggleInsertPanel()}
+function saveDraft(){showToast('Draft saved!')}
+async function publishArticle(){
+  const title=document.getElementById('articleTitleInput').value.trim();
+  const content=document.getElementById('editorArea').innerHTML.trim();
+  const cat=document.getElementById('catSelect').value;
+  const excerpt=document.getElementById('excerptInput').value.trim();
+  const cover=document.getElementById('coverInput').value.trim();
+  if(!title||!content){showToast('Add a title and content first');return;}
+  const now=new Date();
+  const date=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+  const randImg=IMGS[Math.floor(Math.random()*IMGS.length)];
+  const finalExcerpt = excerpt||title.substring(0,90)+'...';
+  try {
+    if(editingId){
+      const idx=articles.findIndex(a=>a.id===editingId);
+      const img = cover||(idx>=0?articles[idx].img:randImg);
+      await apiSend('PUT', '/api/articles/' + editingId, {title,content,cat,excerpt:finalExcerpt,img});
+      if(idx>=0) articles[idx]={...articles[idx],title,content,cat,excerpt:finalExcerpt,img};
+      editingId=null; showToast('Article updated!');
+    } else {
+      const img = cover||randImg;
+      const {id} = await apiSend('POST', '/api/articles', {title,content,cat,date,excerpt:finalExcerpt,img});
+      articles.push({id,title,content,cat,date,excerpt:finalExcerpt,img});
+      showToast('Published! 🎉');
+    }
+  } catch (e) { showToast('Publish failed: ' + e.message); return; }
+  closeOverlay('editorOverlay');currentCat='LATEST';currentPage=1;
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.toggle('active',t.textContent==='LATEST'));
+  render();
+}
+
+/* ══════════════════════════════════
+   OVERLAY HELPERS
+══════════════════════════════════ */
+function openOverlay(id){document.getElementById(id).classList.add('open')}
+function closeOverlay(id){document.getElementById(id).classList.remove('open')}
+['editorOverlay','adminOverlay','gateOverlay'].forEach(id=>{document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))closeOverlay(id)})});
+
+/* ══════════════════════════════════
+   THEME
+══════════════════════════════════ */
+function toggleTheme(){const html=document.documentElement;const isLight=html.getAttribute('data-theme')==='light';html.setAttribute('data-theme',isLight?'dark':'light');document.getElementById('moonIcon').style.display=isLight?'block':'none';document.getElementById('sunIcon').style.display=isLight?'none':'block'}
+
+/* ══════════════════════════════════
+   DRAWER
+══════════════════════════════════ */
+function openDrawer(){updateLibraryUI();document.getElementById('drawer').classList.add('open');document.getElementById('scrim').classList.add('open')}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('scrim').classList.remove('open')}
+
+/* ══════════════════════════════════
+   TOAST + NEWSLETTER
+══════════════════════════════════ */
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
+function subscribe(){const v=document.getElementById('emailInput').value.trim();if(!v||!v.includes('@')){showToast('Enter a valid email');return;}document.getElementById('emailInput').value='';showToast('Subscribed! Welcome 🎉')}
+function subscribe2(){const v=document.getElementById('emailInput2').value.trim();if(!v||!v.includes('@')){showToast('Enter a valid email');return;}document.getElementById('emailInput2').value='';showToast('Subscribed! Welcome 🎉')}
+
+/* INIT */
+loadFromServer();
+updateLibraryUI();
+if (adminToken()) {
+  isAdmin = true;
+  document.getElementById('adminBadge').classList.add('visible');
+  document.getElementById('adminNavBtn').classList.add('active-admin');
+  document.getElementById('adminBtnLabel').textContent = 'Admin ✓';
+}
+</script>
+</body>
+</html>
