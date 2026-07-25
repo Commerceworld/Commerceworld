@@ -1,0 +1,273 @@
+import React, { useState, useEffect } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
+const data = [
+  { year: "2018", value: 28, event: null },
+  { year: "2019", value: 45, event: null },
+  { year: "2020", value: 76, event: null },
+  {
+    year: "2021",
+    value: 93.5,
+    event:
+      "Post-pandemic tech rally and cheap money drove a record VC funding wave into AI startups — private AI investment more than doubled year over year.",
+  },
+  { year: "2022", value: 106, event: null },
+  {
+    year: "2023",
+    value: 95,
+    event:
+      "ChatGPT's late-2022 launch triggered a generative-AI funding rush even as broader VC funding cooled — generative AI investment alone grew roughly 8x from 2022.",
+  },
+  {
+    year: "2024",
+    value: 253,
+    event:
+      "Hyperscalers (Microsoft, Google, Amazon, Meta) sharply raised AI infrastructure and data-center capex, pushing global private AI investment past $250 billion.",
+  },
+  {
+    year: "2025",
+    value: 581,
+    event:
+      "AI infrastructure buildout accelerated further — chips, data centers, and sovereign AI funds (France, Saudi Arabia, UAE) pushed global private AI investment above $580 billion, more than double 2024.",
+  },
+  { year: "2026", value: 650, event: null },
+];
+
+const hikes = data.filter((d) => d.event);
+
+// ---- Theme tokens ----
+const themes = {
+  light: {
+    bg: "#F4EFE6",
+    panel: "#F4EFE6",
+    text: "#1B1B1B",
+    subtext: "#5A5A5A",
+    faint: "#8A8A8A",
+    grid: "#DDD5C4",
+    axis: "#5A5A5A",
+    line: "#1B3A4B",
+    dotFill: "#1B3A4B",
+    accent: "#2E7D5B",
+    accentBg: "#2E7D5B",
+    tooltipBg: "#1B3A4B",
+    tooltipText: "#F4EFE6",
+    tooltipSub: "#8FD9B4",
+    divider: "#1B3A4B",
+    eyebrow: "#2E7D5B",
+  },
+  dark: {
+    bg: "#12181C",
+    panel: "#12181C",
+    text: "#EDEAE1",
+    subtext: "#A9A69C",
+    faint: "#767369",
+    grid: "#2A333A",
+    axis: "#8A8A85",
+    line: "#8FD9B4",
+    dotFill: "#8FD9B4",
+    accent: "#8FD9B4",
+    accentBg: "#8FD9B4",
+    tooltipBg: "#EDEAE1",
+    tooltipText: "#12181C",
+    tooltipSub: "#1F6B45",
+    divider: "#8FD9B4",
+    eyebrow: "#8FD9B4",
+  },
+};
+
+function useSystemDark() {
+  const [sysDark, setSysDark] = useState(
+    typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e) => setSysDark(e.matches);
+    mq.addEventListener ? mq.addEventListener("change", handler) : mq.addListener(handler);
+    return () => {
+      mq.removeEventListener ? mq.removeEventListener("change", handler) : mq.removeListener(handler);
+    };
+  }, []);
+  return sysDark;
+}
+
+// Props: pass darkMode={true|false} from your site's theme state to drive this
+// directly (e.g. darkMode={theme === 'dark'}). If left undefined, it falls back
+// to the OS/browser prefers-color-scheme setting, with a manual toggle for preview.
+export default function AiInvestmentChart({ darkMode }) {
+  const systemDark = useSystemDark();
+  const [manualDark, setManualDark] = useState(systemDark);
+  const isControlled = darkMode !== undefined;
+  const dark = isControlled ? darkMode : manualDark;
+  const t = dark ? themes.dark : themes.light;
+
+  useEffect(() => {
+    if (!isControlled) setManualDark(systemDark);
+  }, [systemDark, isControlled]);
+
+  function CustomDot(props) {
+    const { cx, cy, payload } = props;
+    if (payload.event) {
+      return (
+        <g>
+          <circle cx={cx} cy={cy} r={7} fill={t.accent} stroke={t.bg} strokeWidth={2} />
+        </g>
+      );
+    }
+    return <circle cx={cx} cy={cy} r={4} fill={t.dotFill} stroke={t.bg} strokeWidth={1.5} />;
+  }
+
+  function CustomTooltip({ active, payload, label }) {
+    if (active && payload && payload.length) {
+      const d = payload[0].payload;
+      return (
+        <div
+          style={{
+            background: t.tooltipBg,
+            color: t.tooltipText,
+            padding: "10px 14px",
+            borderRadius: 4,
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: 13,
+            maxWidth: 270,
+            boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
+          }}
+        >
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>{label}</div>
+          <div>${d.value}B global AI investment</div>
+          {d.event && (
+            <div style={{ marginTop: 6, color: t.tooltipSub, fontSize: 12, lineHeight: 1.4 }}>
+              ▲ {d.event}
+            </div>
+          )}
+        </div>
+      );
+    }
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+        background: t.bg,
+        padding: "32px 24px",
+        maxWidth: 880,
+        margin: "0 auto",
+        color: t.text,
+        transition: "background 0.2s ease, color 0.2s ease",
+        position: "relative",
+      }}
+    >
+      {!isControlled && (
+        <button
+          onClick={() => setManualDark(!manualDark)}
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            background: "transparent",
+            border: `1px solid ${t.subtext}`,
+            color: t.subtext,
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: 11,
+            padding: "4px 10px",
+            borderRadius: 3,
+            cursor: "pointer",
+          }}
+        >
+          {dark ? "☀ Light" : "☾ Dark"}
+        </button>
+      )}
+
+      <div style={{ marginBottom: 4, fontSize: 12, letterSpacing: 2, color: t.eyebrow, fontWeight: 700 }}>
+        ECONOMICPULSE · AI ECONOMY
+      </div>
+      <h2
+        style={{
+          fontFamily: "Georgia, 'Times New Roman', serif",
+          fontSize: 28,
+          margin: "0 0 4px 0",
+          color: t.text,
+        }}
+      >
+        Global AI Investment, 2018–2026
+      </h2>
+      <p style={{ fontSize: 13, color: t.subtext, margin: "0 0 24px 0", maxWidth: 640 }}>
+        Estimated global private AI investment (US$ billions). The boom accelerated sharply
+        after ChatGPT's 2022 launch, as hyperscalers and sovereign funds poured capital into
+        AI infrastructure.
+      </p>
+
+      <ResponsiveContainer width="100%" height={360}>
+        <LineChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid stroke={t.grid} strokeDasharray="0" vertical={false} />
+          <XAxis
+            dataKey="year"
+            stroke={t.axis}
+            tick={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, fill: t.axis }}
+            axisLine={{ stroke: t.axis }}
+            tickLine={false}
+          />
+          <YAxis
+            stroke={t.axis}
+            tick={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, fill: t.axis }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v) => `$${v}B`}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={t.line}
+            strokeWidth={2.5}
+            dot={<CustomDot />}
+            activeDot={{ r: 8 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+
+      <div style={{ marginTop: 28, borderTop: `2px solid ${t.divider}`, paddingTop: 16 }}>
+        <div style={{ fontSize: 12, letterSpacing: 1.5, color: t.eyebrow, fontWeight: 700, marginBottom: 10 }}>
+          WHY INVESTMENT JUMPED
+        </div>
+        {hikes.map((h) => (
+          <div key={h.year} style={{ display: "flex", gap: 14, marginBottom: 12 }}>
+            <div
+              style={{
+                fontFamily: "Georgia, serif",
+                fontWeight: 700,
+                color: t.text,
+                fontSize: 15,
+                minWidth: 46,
+              }}
+            >
+              {h.year}
+            </div>
+            <div style={{ fontSize: 13.5, lineHeight: 1.5, color: t.text }}>
+              <span style={{ color: t.accent, fontWeight: 700 }}>${h.value}B — </span>
+              {h.event}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 20, fontSize: 11, color: t.faint }}>
+        Figures are approximate global private AI investment estimates compiled from Stanford
+        HAI AI Index and industry funding trackers; methodology varies by source, so treat as
+        directional rather than exact. 2026 is a year-to-date estimate.
+      </div>
+    </div>
+  );
+}
