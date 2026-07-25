@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Infrastructure Investment by Company | EconomicPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Georgia&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4EFE6;
+    --text: #1B1B1B;
+    --subtext: #5A5A5A;
+    --faint: #8A8A8A;
+    --grid: #DDD5C4;
+    --axis: #5A5A5A;
+    --tooltip-bg: #1B3A4B;
+    --tooltip-text: #F4EFE6;
+    --divider: #1B3A4B;
+    --eyebrow: #2E7D5B;
+    --msft: #1B3A4B;
+    --googl: #2E7D5B;
+    --amzn: #C9862B;
+    --meta: #7A4FA0;
+  }
+  html[data-theme="dark"] {
+    --bg: #12181C;
+    --text: #EDEAE1;
+    --subtext: #A9A69C;
+    --faint: #767369;
+    --grid: #2A333A;
+    --axis: #8A8A85;
+    --tooltip-bg: #EDEAE1;
+    --tooltip-text: #12181C;
+    --divider: #8FD9B4;
+    --eyebrow: #8FD9B4;
+    --msft: #6FA8DC;
+    --googl: #8FD9B4;
+    --amzn: #E0A84D;
+    --meta: #B98FD9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 24px; position: relative; }
+  #themeToggle {
+    position: absolute; top: 20px; right: 20px;
+    background: transparent; border: 1px solid var(--subtext); color: var(--subtext);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 10px;
+    border-radius: 3px; cursor: pointer;
+  }
+  .eyebrow { margin-bottom: 4px; font-size: 12px; letter-spacing: 2px; color: var(--eyebrow); font-weight: 700; }
+  h2 { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; margin: 0 0 4px 0; }
+  .desc { font-size: 13px; color: var(--subtext); margin: 0 0 20px 0; max-width: 680px; line-height: 1.5; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .chart-container { position: relative; height: 380px; width: 100%; }
+  .chart-container svg { width: 100%; height: 100%; overflow: visible; }
+  #svgTooltip {
+    position: absolute; display: none; background: var(--tooltip-bg); color: var(--tooltip-text);
+    padding: 8px 12px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    line-height: 1.4; box-shadow: 0 4px 14px rgba(0,0,0,0.3); pointer-events: none; z-index: 10; white-space: nowrap;
+  }
+  table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 12.5px; }
+  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--subtext); font-weight: 700; font-size: 11px; letter-spacing: 0.5px; }
+  .src-note { margin-top: 22px; font-size: 11px; color: var(--faint); line-height: 1.6; border-top: 2px solid var(--divider); padding-top: 14px; }
+  .src-note a { color: var(--faint); }
+  .src-list { margin: 8px 0 0 0; padding-left: 18px; }
+  .src-list li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <button id="themeToggle">☾ Dark</button>
+
+  <div class="eyebrow">ECONOMICPULSE · AI ECONOMY</div>
+  <h2>AI Infrastructure Investment by Company, 2023–2026</h2>
+  <p class="desc">
+    Annual capital expenditure (including finance leases) at the four biggest AI infrastructure
+    spenders. This is real, reported spending — not an estimate — pulled from each company's own
+    10-K filings and earnings releases. 2026 figures are company guidance issued during 2026
+    earnings calls.
+  </p>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="chart-container" id="chartContainer">
+    <div id="svgTooltip"></div>
+  </div>
+
+  <table id="dataTable"></table>
+
+  <div class="src-note">
+    <strong>Sources:</strong> figures are calendar-year capital expenditures including finance
+    lease principal payments, compiled from company SEC filings, earnings press releases, and
+    cross-checked against Platformonomics' annual "Follow the CAPEX" hyperscaler retrospective.
+    <ul class="src-list">
+      <li>Meta: 10-K / Q4 earnings releases (2023: $28.10B, 2024: $39.23B, 2025: $72.22B)</li>
+      <li>Alphabet/Google: Q4 earnings releases and 10-K filings (2023: $32.25B, 2024: $52.54B, 2025: $91.45B)</li>
+      <li>Amazon: 10-K filings and earnings releases (2023: $52.73B, 2024: $83.0B, 2025: $131.82B)</li>
+      <li>Microsoft: derived from combined 4-company annual totals reported by Platformonomics
+        ($155B in 2023, $251B in 2024, ~$416B in 2025) minus the other three companies' confirmed
+        figures, since Microsoft's fiscal year (ending June 30) doesn't map cleanly onto calendar-year
+        press releases the way the other three do.</li>
+      <li>2026 guidance: company earnings calls and CNBC/Yahoo Finance/Tom's Hardware coverage of
+        Q1–Q2 2026 results (Microsoft ~$190B, Alphabet $175–185B, Amazon ~$200B, Meta $125–145B).</li>
+    </ul>
+    Figures round to the nearest $0.1B. Combined 4-company capex is on pace to approach $725B in 2026,
+    up from roughly $155B just three years earlier in 2023.
+  </div>
+</div>
+
+<script>
+const companies = [
+  { key: 'msft', name: 'Microsoft' },
+  { key: 'googl', name: 'Alphabet (Google)' },
+  { key: 'amzn', name: 'Amazon' },
+  { key: 'meta', name: 'Meta' },
+];
+
+const data = [
+  { year: '2023', msft: 41.9, googl: 32.3, amzn: 52.7, meta: 28.1 },
+  { year: '2024', msft: 76.0, googl: 52.5, amzn: 83.0, meta: 39.2 },
+  { year: '2025', msft: 118.0, googl: 91.4, amzn: 131.8, meta: 72.2 },
+  { year: '2026E', msft: 190.0, googl: 185.0, amzn: 200.0, meta: 135.0 },
+];
+
+function getThemeColors() {
+  const style = getComputedStyle(document.documentElement);
+  const c = {};
+  ['grid','axis','tooltip-bg','tooltip-text','msft','googl','amzn','meta','bg'].forEach(k => {
+    c[k.replace('-', '')] = style.getPropertyValue('--' + k).trim();
+  });
+  return c;
+}
+
+function renderLegend() {
+  const c = getThemeColors();
+  const legend = document.getElementById('legend');
+  legend.innerHTML = companies.map(co => `
+    <div class="legend-item">
+      <span class="legend-dot" style="background:${c[co.key]}"></span>${co.name}
+    </div>
+  `).join('');
+}
+
+const NS = "http://www.w3.org/2000/svg";
+
+function renderChart() {
+  const c = getThemeColors();
+  const container = document.getElementById('chartContainer');
+  const tooltip = document.getElementById('svgTooltip');
+  container.querySelectorAll('svg').forEach(el => el.remove());
+
+  const width = container.clientWidth || 860;
+  const height = container.clientHeight || 380;
+  const padL = 50, padR = 20, padT = 20, padB = 34;
+  const plotW = width - padL - padR;
+  const plotH = height - padT - padB;
+
+  const maxVal = Math.max(...data.flatMap(d => companies.map(co => d[co.key])));
+  const niceMax = Math.ceil(maxVal / 20) * 20;
+  const yTicks = 5;
+
+  const groupW = plotW / data.length;
+  const barGap = 4;
+  const barW = (groupW - barGap * (companies.length + 1)) / companies.length;
+
+  const yPos = v => padT + plotH - (v / niceMax) * plotH;
+
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  for (let i = 0; i <= yTicks; i++) {
+    const val = (niceMax / yTicks) * i;
+    const y = yPos(val);
+    const gridLine = document.createElementNS(NS, 'line');
+    gridLine.setAttribute('x1', padL);
+    gridLine.setAttribute('x2', width - padR);
+    gridLine.setAttribute('y1', y);
+    gridLine.setAttribute('y2', y);
+    gridLine.setAttribute('stroke', c.grid);
+    gridLine.setAttribute('stroke-width', '1');
+    svg.appendChild(gridLine);
+
+    const label = document.createElementNS(NS, 'text');
+    label.setAttribute('x', padL - 8);
+    label.setAttribute('y', y + 4);
+    label.setAttribute('text-anchor', 'end');
+    label.setAttribute('font-family', "'IBM Plex Mono', monospace");
+    label.setAttribute('font-size', '11');
+    label.setAttribute('fill', c.axis);
+    label.textContent = `$${val}B`;
+    svg.appendChild(label);
+  }
+
+  data.forEach((d, gi) => {
+    const groupX = padL + gi * groupW;
+
+    companies.forEach((co, ci) => {
+      const val = d[co.key];
+      const barH = (val / niceMax) * plotH;
+      const x = groupX + barGap + ci * (barW + barGap);
+      const y = padT + plotH - barH;
+
+      const rect = document.createElementNS(NS, 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', barW);
+      rect.setAttribute('height', barH);
+      rect.setAttribute('fill', c[co.key]);
+      rect.setAttribute('rx', '2');
+      rect.style.cursor = 'pointer';
+
+      const showTip = (clientX, clientY) => {
+        const rect2 = container.getBoundingClientRect();
+        tooltip.innerHTML = `<strong>${co.name} · ${d.year}</strong><br>$${val.toFixed(1)}B capex`;
+        tooltip.style.display = 'block';
+        let left = clientX - rect2.left + 12;
+        let top = clientY - rect2.top - 10;
+        if (left + 160 > width) left = clientX - rect2.left - 160;
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+      };
+      rect.addEventListener('mousemove', (e) => showTip(e.clientX, e.clientY));
+      rect.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+      rect.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        showTip(t.clientX, t.clientY);
+      }, { passive: true });
+
+      svg.appendChild(rect);
+    });
+
+    const label = document.createElementNS(NS, 'text');
+    label.setAttribute('x', groupX + groupW / 2);
+    label.setAttribute('y', height - 10);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-family', "'IBM Plex Mono', monospace");
+    label.setAttribute('font-size', '12');
+    label.setAttribute('font-weight', d.year.includes('E') ? '700' : '400');
+    label.setAttribute('fill', c.axis);
+    label.textContent = d.year;
+    svg.appendChild(label);
+  });
+
+  container.insertBefore(svg, tooltip);
+}
+
+function renderTable() {
+  const table = document.getElementById('dataTable');
+  let html = '<tr><th>Company</th>' + data.map(d => `<th>${d.year}</th>`).join('') + '</tr>';
+  companies.forEach(co => {
+    html += `<tr><td>${co.name}</td>` + data.map(d => `<td>$${d[co.key].toFixed(1)}B</td>`).join('') + '</tr>';
+  });
+  const totals = data.map(d => companies.reduce((s, co) => s + d[co.key], 0));
+  html += '<tr><td><strong>Combined</strong></td>' + totals.map(t => `<td><strong>$${t.toFixed(0)}B</strong></td>`).join('') + '</tr>';
+  table.innerHTML = html;
+}
+
+function setTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeToggle').textContent = dark ? '☀ Light' : '☾ Dark';
+  renderLegend();
+  renderChart();
+  renderTable();
+}
+
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+let isDark = prefersDark;
+setTheme(isDark);
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  isDark = !isDark;
+  setTheme(isDark);
+});
+
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    isDark = e.matches;
+    setTheme(isDark);
+  });
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderChart, 150);
+});
+</script>
+
+</body>
+</html>
